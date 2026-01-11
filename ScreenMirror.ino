@@ -1,22 +1,35 @@
-#include "espsm_conf.h"
 #include <Arduino.h>
 #include <Arduino_GFX_Library.h>
 #include <WiFi.h>
 #include <WebSocketsServer.h>
 
-WebSocketsServer webSocket(WEBSOCKET_PORT);
-Arduino_DataBus *bus = new Arduino_ESP32SPI(BUS_CS, BUS_DC, BUS_RST, BUS_WR, BUS_RD);
+const char* ssid = "YOUR_SSID";
+const char* password = "YOUR_PASSWORD";
+const int websocket_port = 81;
+
+WebSocketsServer webSocket = WebSocketsServer(websocket_port);
+
+#define LCD_ROTATION 1
+#define LCD_H_RES 240
+#define LCD_V_RES 320
+#define LCD_BL 1
+
+Arduino_DataBus *bus = new Arduino_ESP32SPI(42, 45, 39, 38, 40);
 Arduino_GFX *gfx = new Arduino_ST7789(bus, -1, LCD_ROTATION, true, LCD_H_RES, LCD_V_RES);
+
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+#define RAW_BUFFER_SIZE (SCREEN_WIDTH*SCREEN_HEIGHT*2)
 
 uint8_t* raw_buffer;
 size_t received_bytes = 0;
-
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
   if(type == WStype_BIN){
     if(received_bytes + length <= RAW_BUFFER_SIZE){
       memcpy(raw_buffer + received_bytes, payload, length);
       received_bytes += length;
     }
+
     if(received_bytes >= RAW_BUFFER_SIZE){
       gfx->draw16bitRGBBitmap(0, 0, (uint16_t*)raw_buffer, SCREEN_WIDTH, SCREEN_HEIGHT);
       received_bytes = 0;
@@ -24,10 +37,11 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
   }
 }
 
+
 void setup() {
   Serial.begin(115200);
-  pinMode(LCD_BL_PIN, OUTPUT);
-  analogWrite(LCD_BL_PIN, LCD_BL_BRIGHTNESS);
+  pinMode(LCD_BL, OUTPUT);
+  analogWrite(LCD_BL, 200);
 
   gfx->begin();
   gfx->fillScreen(gfx->color565(0,0,0));
@@ -46,7 +60,7 @@ void setup() {
   }
 
   int dots = 0;
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.begin(ssid, password);
   while(WiFi.status() != WL_CONNECTED){
     delay(500);
     gfx->print(".");
