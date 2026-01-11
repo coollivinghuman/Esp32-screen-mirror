@@ -82,7 +82,7 @@ void setup() {
   gfx->setCursor(10, 50);
   gfx->print("Waiting For Client...");
   gfx->setCursor(10, 70);
-  gfx->print("Download Client Here: (nolink)");
+  gfx->print("Download Client Here: https://github.com/coollivinghuman/Esp32-screen-mirror/blob/main/EspSM.py");
 
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
