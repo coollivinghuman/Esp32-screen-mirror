@@ -1,0 +1,25 @@
+{
+  "device": "Waveshare-2inch-Touch-LCD-Camera",
+  "board": "ESP32-S3",
+  "display_driver": "ST7789",
+  "lcd": {
+    "rotation": 1,
+    "backlight_pin": 1,
+    "horizontal_resolution": 240,
+    "vertical_resolution": 320
+  },
+  "spi_bus": {
+    "cs": 42,
+    "dc": 45,
+    "rst": 39,
+    "wr": 38,
+    "rd": 40
+  },
+  "screen": {
+    "width": 320,
+    "height": 240
+  },
+  "websocket": {
+    "port": 81
+  }
+}
